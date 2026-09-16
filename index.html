@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Guard Antivirus - WebstieCrew</title>
+    <title>The Guard - High-Performance Security Engine</title>
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --border-color: #1f2937;
+            --bg-color: #06090e;
+            --card-bg: #0d1117;
+            --border-color: #21262d;
             --accent-color: #10b981;
-            --accent-glow: rgba(16, 185, 129, 0.2);
-            --text-color: #f3f4f6;
-            --text-muted: #9ca3af;
-            --code-bg: #050811;
+            --accent-glow: rgba(16, 185, 129, 0.15);
+            --text-color: #f0f6fc;
+            --text-muted: #8b949e;
+            --code-bg: #161b22;
+            --warning-color: #f59e0b;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
@@ -34,67 +35,95 @@
 
         header {
             border-bottom: 1px solid var(--border-color);
-            padding: 2rem 1rem;
+            padding: 3rem 1rem;
             text-align: center;
-            background: radial-gradient(circle at top, #1e293b 0%, var(--bg-color) 70%);
+            background: radial-gradient(circle at top, #161b22 0%, var(--bg-color) 80%);
         }
 
         .logo-container {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 0.5rem;
+            gap: 14px;
+            margin-bottom: 0.75rem;
         }
 
         .shield-icon {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             fill: var(--accent-color);
+            filter: drop-shadow(0 0 8px var(--accent-glow));
         }
 
         header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
+            font-size: 2.75rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin: 0.5rem auto 0;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-color);
         }
 
         main {
-            max-width: 1000px;
+            max-width: 1100px;
             width: 100%;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
             flex: 1;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: border-color 0.2s ease;
+            border-radius: 10px;
+            padding: 1.75rem;
+            transition: all 0.2s ease;
         }
 
         .card:hover {
             border-color: var(--accent-color);
+            transform: translateY(-2px);
         }
 
         .card h3 {
             color: var(--accent-color);
             margin-bottom: 0.5rem;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .card p {
@@ -102,12 +131,26 @@
             font-size: 0.95rem;
         }
 
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 850px) {
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .code-section {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 1.5rem;
-            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .code-header {
@@ -116,47 +159,69 @@
             align-items: center;
             margin-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.75rem;
         }
 
         .code-title {
             font-weight: 600;
-            color: var(--accent-color);
+            color: var(--text-color);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         pre {
             background-color: var(--code-bg);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 1rem;
+            padding: 1.25rem;
             overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            color: #e5e7eb;
+            font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Consolas, monospace;
+            font-size: 0.875rem;
+            color: #c9d1d9;
+            flex: 1;
+        }
+
+        .cta-container {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 3rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .cta-container h2 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
         }
 
         .btn-github {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background-color: var(--accent-color);
             color: #000;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
+            font-weight: 700;
+            padding: 0.85rem 2rem;
+            border-radius: 8px;
             text-decoration: none;
-            transition: background-color 0.2s ease;
-            text-align: center;
+            transition: all 0.2s ease;
         }
 
         .btn-github:hover {
             background-color: #34d399;
+            box-shadow: 0 0 15px var(--accent-glow);
         }
 
         footer {
             border-top: 1px solid var(--border-color);
-            padding: 1.5rem;
+            padding: 2rem;
             text-align: center;
             color: var(--text-muted);
             font-size: 0.875rem;
+            background-color: var(--card-bg);
         }
 
         footer a {
@@ -174,57 +239,103 @@
             </svg>
             <h1>The Guard</h1>
         </div>
-        <p>Lightweight & High-Performance Security Engine by WebstieCrew</p>
+        <p>High-Performance, Multi-Threaded Native Security Engine</p>
+        <div class="status-badge">
+            <span class="status-dot"></span> Core Daemon Active v1.0.0
+        </div>
     </header>
 
     <main>
         <div class="grid">
             <div class="card">
-                <h3>Real-Time Engine</h3>
-                <p>Monitors system activity continuously to neutralize threats before execution using multi-threaded scanning capabilities.</p>
+                <h3>Realtime Engine</h3>
+                <p>Native multi-threaded execution loop configured with low-overhead system call interception and signal handling.</p>
             </div>
             <div class="card">
-                <h3>Custom .c Configuration</h3>
-                <p>Replaces verbose XML formats with a clean, lightweight structured file syntax designed specifically for binary performance.</p>
+                <h3>Native Parser</h3>
+                <p>Zero-dependency C parser for direct file loading, eliminating complex config overhead for maximal boot speed.</p>
             </div>
             <div class="card">
-                <h3>Automated Vault</h3>
-                <p>Isolates high-risk files instantly into a secure quarantine directory based on configurable threat action policies.</p>
+                <h3>Isolation Vault</h3>
+                <p>Automated threat response mechanism isolating suspicious binaries directly to configured quarantine directories.</p>
+            </div>
+        </div>
+
+        <div class="section-grid">
+            <div class="code-section">
+                <div class="code-header">
+                    <span class="code-title">Configuration Specification (project.c)</span>
+                </div>
+                <pre><code>name = "The Guard"
+version = "1.0.0"
+developer = "WebstieCrew"
+license = "MIT"
+
+realtime_protection = true
+scan_threads = 8
+heuristic_level = "HIGH"
+max_file_size_mb = 250
+
+database_url = "https://signatures.theguard.internal"
+auto_update = true
+update_interval_hours = 4
+
+on_threat_detected = "QUARANTINE"
+quarantine_dir = "/var/lib/theguard/vault"</code></pre>
+            </div>
+
+            <div class="code-section">
+                <div class="code-header">
+                    <span class="code-title">Control Gateway Paths (src/guard/Paths.js)</span>
+                </div>
+                <pre><code>export const PUBLIC_PATHS = {
+  LOGIN: '/login',
+  REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
+  UNAUTHORIZED: '/unauthorized',
+  NOT_FOUND: '/404',
+};
+
+export const PRIVATE_PATHS = {
+  DASHBOARD: '/dashboard',
+  PROFILE: '/profile',
+  SETTINGS: '/settings',
+};
+
+export const ADMIN_PATHS = {
+  MANAGE_USERS: '/admin/users',
+  SYSTEM_LOGS: '/admin/logs',
+};
+
+export const PATHS = {
+  ...PUBLIC_PATHS,
+  ...PRIVATE_PATHS,
+  ...ADMIN_PATHS,
+};</code></pre>
             </div>
         </div>
 
         <div class="code-section">
             <div class="code-header">
-                <span class="code-title">Configuration File Structure (project.c)</span>
+                <span class="code-title">CLI Daemon Execution</span>
             </div>
-            <pre><code>app_info {
-    name = "Guard Antivirus";
-    version = "1.0.0";
-    developer = "WebstieCrew";
-    license = "MIT";
-}
+            <pre><code># Build and run system daemon with custom configuration
+$ gcc -O3 src/main.c src/guard/config.c -o system-guard
+$ ./system-guard --config project.c --verbose
 
-engine_settings {
-    realtime_protection = true;
-    scan_threads = 4;
-    heuristic_level = "high";
-    max_file_size_mb = 100;
-}
-
-signatures {
-    database_url = "https://signatures.guard.internal/v1/definitions.bin";
-    auto_update = true;
-    update_interval_hours = 6;
-}
-
-action_policies {
-    on_threat_detected = "quarantine";
-    quarantine_dir = "./vault";
-}</code></pre>
+[INFO] The Guard Engine Control Panel (v1.0.0)
+[INFO] Realtime Guard : ENABLED (8 Cores)
+[INFO] Isolation Vault: /var/lib/theguard/vault
+[INFO] Engine running. Press Ctrl+C to terminate.</code></pre>
         </div>
 
-        <div style="text-align: center; margin-top: 1rem;">
-            <a href="https://github.com/WebstieCrew/The-Guard" target="_blank" class="btn-github">View Repository on GitHub</a>
+        <div class="cta-container">
+            <h2>Open Source Core Security</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Inspect the source code, contribute modules, or integrate The Guard into your infrastructure.</p>
+            <a href="https://github.com/WebstieCrew/The-Guard" target="_blank" class="btn-github">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                View Repository on GitHub
+            </a>
         </div>
     </main>
 
