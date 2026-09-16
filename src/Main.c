@@ -1,92 +1,105 @@
+#include "guard/config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <stdbool.h>
+#include <getopt.h>
 
-typedef struct {
-    char name[64];
-    char version[16];
-    char developer[64];
-    char license[32];
-    bool realtime_protection;
-    int scan_threads;
-    char heuristic_level[16];
-    int max_file_size_mb;
-    char database_url[128];
-    bool auto_update;
-    int update_interval_hours;
-    char on_threat_detected[32];
-    char quarantine_dir[128];
-} GuardConfig;
+static volatile sig_atomic_t g_running = 1;
 
-void parse_project_c(const char *filename, GuardConfig *config) {
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        return;
-    }
-
-    char line[256];
-    while (fgets(line, sizeof(line), file)) {
-        if (strstr(line, "name =")) {
-            sscanf(line, " name = \"%[^\"]\"", config->name);
-        } else if (strstr(line, "version =")) {
-            sscanf(line, " version = \"%[^\"]\"", config->version);
-        } else if (strstr(line, "developer =")) {
-            sscanf(line, " developer = \"%[^\"]\"", config->developer);
-        } else if (strstr(line, "license =")) {
-            sscanf(line, " license = \"%[^\"]\"", config->license);
-        } else if (strstr(line, "realtime_protection =")) {
-            char val[16];
-            sscanf(line, " realtime_protection = %[^;]", val);
-            config->realtime_protection = (strstr(val, "true") != NULL);
-        } else if (strstr(line, "scan_threads =")) {
-            sscanf(line, " scan_threads = %d;", &config->scan_threads);
-        } else if (strstr(line, "heuristic_level =")) {
-            sscanf(line, " heuristic_level = \"%[^\"]\"", config->heuristic_level);
-        } else if (strstr(line, "max_file_size_mb =")) {
-            sscanf(line, " max_file_size_mb = %d;", &config->max_file_size_mb);
-        } else if (strstr(line, "database_url =")) {
-            sscanf(line, " database_url = \"%[^\"]\"", config->database_url);
-        } else if (strstr(line, "auto_update =")) {
-            char val[16];
-            sscanf(line, " auto_update = %[^;]", val);
-            config->auto_update = (strstr(val, "true") != NULL);
-        } else if (strstr(line, "update_interval_hours =")) {
-            sscanf(line, " update_interval_hours = %d;", &config->update_interval_hours);
-        } else if (strstr(line, "on_threat_detected =")) {
-            sscanf(line, " on_threat_detected = \"%[^\"]\"", config->on_threat_detected);
-        } else if (strstr(line, "quarantine_dir =")) {
-            sscanf(line, " quarantine_dir = \"%[^\"]\"", config->quarantine_dir);
-        }
-    }
-
-    fclose(file);
+static void signal_handler(int signum) {
+    (void)signum;
+    g_running = 0;
 }
 
-void print_status(const GuardConfig *config) {
-    printf("[%s v%s]\n", config->name, config->version);
-    printf("Developer: %s\n", config->developer);
-    printf("License: %s\n", config->license);
-    printf("Realtime Protection: %s\n", config->realtime_protection ? "ENABLED" : "DISABLED");
-    printf("Threads: %d\n", config->scan_threads);
-    printf("Heuristics: %s\n", config->heuristic_level);
-    printf("Max File Size: %d MB\n", config->max_file_size_mb);
-    printf("Signature Server: %s\n", config->database_url);
-    printf("Auto Update: %s (Every %dh)\n", config->auto_update ? "ON" : "OFF", config->update_interval_hours);
-    printf("Threat Policy: %s\n", config->on_threat_detected);
-    printf("Quarantine Vault: %s\n", config->quarantine_dir);
+static void register_signal_handlers(void) {
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGHUP, &sa, NULL);
+}
+
+static void display_help(const char *executable) {
+    printf("Usage: %s [OPTIONS]\n", executable);
+    printf("Options:\n");
+    printf("  -c, --config <path>    Specify configuration file path\n");
+    printf("  -t, --test             Validate configuration file syntax and exit\n");
+    printf("  -v, --verbose          Enable debug logging level\n");
+    printf("  -h, --help             Display usage details\n");
+    printf("  -V, --version          Print engine version\n");
 }
 
 int main(int argc, char *argv[]) {
-    const char *config_file = "project.c";
-    if (argc > 1) {
-        config_file = argv[1];
+    const char *config_path = "project.c";
+    bool dry_run = false;
+    bool force_verbose = false;
+
+    static struct option long_options[] = {
+        {"config",   required_argument, 0, 'c'},
+        {"test",     no_argument,       0, 't'},
+        {"verbose",  no_argument,       0, 'v'},
+        {"help",     no_argument,       0, 'h'},
+        {"version",  no_argument,       0, 'V'},
+        {0, 0, 0, 0}
+    };
+
+    int opt;
+    int option_index = 0;
+
+    while ((opt = getopt_long(argc, argv, "c:tvhV", long_options, &option_index)) != -1) {
+        switch (opt) {
+            case 'c':
+                config_path = optarg;
+                break;
+            case 't':
+                dry_run = true;
+                break;
+            case 'v':
+                force_verbose = true;
+                break;
+            case 'h':
+                display_help(argv[0]);
+                return EXIT_SUCCESS;
+            case 'V':
+                printf("The-Guard Security Engine v1.0.0\n");
+                return EXIT_SUCCESS;
+            default:
+                display_help(argv[0]);
+                return EXIT_FAILURE;
+        }
     }
 
-    GuardConfig config = {0};
-    parse_project_c(config_file, &config);
+    register_signal_handlers();
 
-    print_status(&config);
+    GuardConfig config;
+    config_set_defaults(&config);
 
-    return 0;
+    if (!config_load_from_file(config_path, &config)) {
+        fprintf(stderr, "[ERROR] Failed to parse configuration file: %s\n", config_path);
+        return EXIT_FAILURE;
+    }
+
+    if (force_verbose) {
+        config.log_level = LOG_LEVEL_DEBUG;
+    }
+
+    if (dry_run) {
+        printf("[OK] Configuration file syntax is valid.\n");
+        return EXIT_SUCCESS;
+    }
+
+    config_print_status(&config);
+
+    printf("[INFO] Initializing engine core runtime...\n");
+
+    while (g_running) {
+    }
+
+    printf("[INFO] Performing graceful engine shutdown sequence...\n");
+    return EXIT_SUCCESS;
 }
