@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Guard Antivirus - WebstieCrew</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --accent-color: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.2);
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --code-bg: #050811;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            text-align: center;
+            background: radial-gradient(circle at top, #1e293b 0%, var(--bg-color) 70%);
+        }
+
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .shield-icon {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-color);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        main {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .card h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .code-section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .code-title {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #e5e7eb;
+        }
+
+        .btn-github {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-github:hover {
+            background-color: #34d399;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <svg class="shield-icon" viewBox="0 0 24 24">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8subscriptionz"/>
+            </svg>
+            <h1>The Guard</h1>
+        </div>
+        <p>Lightweight & High-Performance Security Engine by WebstieCrew</p>
+    </header>
+
+    <main>
+        <div class="grid">
+            <div class="card">
+                <h3>Real-Time Engine</h3>
+                <p>Monitors system activity continuously to neutralize threats before execution using multi-threaded scanning capabilities.</p>
+            </div>
+            <div class="card">
+                <h3>Custom .c Configuration</h3>
+                <p>Replaces verbose XML formats with a clean, lightweight structured file syntax designed specifically for binary performance.</p>
+            </div>
+            <div class="card">
+                <h3>Automated Vault</h3>
+                <p>Isolates high-risk files instantly into a secure quarantine directory based on configurable threat action policies.</p>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <div class="code-header">
+                <span class="code-title">Configuration File Structure (project.c)</span>
+            </div>
+            <pre><code>app_info {
+    name = "Guard Antivirus";
+    version = "1.0.0";
+    developer = "WebstieCrew";
+    license = "MIT";
+}
+
+engine_settings {
+    realtime_protection = true;
+    scan_threads = 4;
+    heuristic_level = "high";
+    max_file_size_mb = 100;
+}
+
+signatures {
+    database_url = "https://signatures.guard.internal/v1/definitions.bin";
+    auto_update = true;
+    update_interval_hours = 6;
+}
+
+action_policies {
+    on_threat_detected = "quarantine";
+    quarantine_dir = "./vault";
+}</code></pre>
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="https://github.com/WebstieCrew/The-Guard" target="_blank" class="btn-github">View Repository on GitHub</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; WebstieCrew - <a href="https://github.com/WebstieCrew/The-Guard" target="_blank">The Guard Project</a></p>
+    </footer>
+
+</body>
+</html>
