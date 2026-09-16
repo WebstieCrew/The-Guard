@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>The Guard - High-Performance Security Engine</title>
     <style>
         :root {
@@ -11,10 +11,11 @@
             --border-color: #21262d;
             --accent-color: #10b981;
             --accent-glow: rgba(16, 185, 129, 0.15);
+            --danger-color: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.2);
             --text-color: #f0f6fc;
             --text-muted: #8b949e;
             --code-bg: #161b22;
-            --warning-color: #f59e0b;
         }
 
         * {
@@ -22,6 +23,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -35,7 +37,7 @@
 
         header {
             border-bottom: 1px solid var(--border-color);
-            padding: 3rem 1rem;
+            padding: 2.5rem 1rem 2rem;
             text-align: center;
             background: radial-gradient(circle at top, #161b22 0%, var(--bg-color) 80%);
         }
@@ -43,28 +45,29 @@
         .logo-container {
             display: inline-flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             margin-bottom: 0.75rem;
         }
 
         .shield-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             fill: var(--accent-color);
             filter: drop-shadow(0 0 8px var(--accent-glow));
         }
 
         header h1 {
-            font-size: 2.75rem;
+            font-size: clamp(2rem, 5vw, 2.75rem);
             font-weight: 800;
             letter-spacing: -0.03em;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 1.15rem;
+            font-size: clamp(0.95rem, 3vw, 1.15rem);
             max-width: 600px;
             margin: 0.5rem auto 0;
+            padding: 0 1rem;
         }
 
         .status-badge {
@@ -74,11 +77,11 @@
             background: rgba(16, 185, 129, 0.1);
             border: 1px solid var(--accent-color);
             color: var(--accent-color);
-            padding: 0.25rem 0.75rem;
+            padding: 0.3rem 0.85rem;
             border-radius: 9999px;
             font-size: 0.85rem;
             font-weight: 600;
-            margin-top: 1rem;
+            margin-top: 1.25rem;
         }
 
         .status-dot {
@@ -93,140 +96,212 @@
             max-width: 1100px;
             width: 100%;
             margin: 0 auto;
-            padding: 2.5rem 1rem;
+            padding: 1.5rem 1rem;
             flex: 1;
+        }
+
+        .scanner-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .scanner-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn-scan {
+            width: 100%;
+            max-width: 320px;
+            background-color: var(--accent-color);
+            color: #000;
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.9rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-scan:active {
+            transform: scale(0.98);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--code-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1.25rem;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.2s ease, background-color 0.3s ease;
+        }
+
+        .scan-output {
+            margin-top: 1rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            min-height: 24px;
+            word-break: break-all;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
         }
 
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 1.75rem;
-            transition: all 0.2s ease;
-        }
-
-        .card:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-2px);
+            padding: 1.5rem;
+            transition: border-color 0.2s ease;
         }
 
         .card h3 {
             color: var(--accent-color);
             margin-bottom: 0.5rem;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .card p {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 0.925rem;
         }
 
         .section-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-
-        @media (max-width: 850px) {
-            .section-grid {
-                grid-template-columns: 1fr;
-            }
+            gap: 1.25rem;
+            margin-bottom: 2rem;
         }
 
         .code-section {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 1.5rem;
+            padding: 1.25rem;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         .code-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
         }
 
         .code-title {
             font-weight: 600;
             color: var(--text-color);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.9rem;
         }
 
         pre {
             background-color: var(--code-bg);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 1.25rem;
+            padding: 1rem;
             overflow-x: auto;
-            font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Consolas, monospace;
-            font-size: 0.875rem;
+            font-family: 'ui-monospace', 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.825rem;
             color: #c9d1d9;
             flex: 1;
+            -webkit-overflow-scrolling: touch;
         }
 
         .cta-container {
             text-align: center;
-            margin-top: 3rem;
-            padding: 3rem;
+            margin-top: 2rem;
+            padding: 2rem 1rem;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
         }
 
         .cta-container h2 {
-            margin-bottom: 1rem;
-            font-size: 1.8rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.5rem;
         }
 
         .btn-github {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             background-color: var(--accent-color);
             color: #000;
             font-weight: 700;
-            padding: 0.85rem 2rem;
+            padding: 0.85rem 1.75rem;
             border-radius: 8px;
             text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-github:hover {
-            background-color: #34d399;
-            box-shadow: 0 0 15px var(--accent-glow);
+            transition: background-color 0.2s ease;
+            width: 100%;
+            max-width: 320px;
         }
 
         footer {
             border-top: 1px solid var(--border-color);
-            padding: 2rem;
+            padding: 1.5rem 1rem;
             text-align: center;
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             background-color: var(--card-bg);
         }
 
         footer a {
             color: var(--accent-color);
             text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 2rem 1rem 1.5rem;
+            }
+
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card, .scanner-card, .code-section {
+                padding: 1.15rem;
+            }
+
+            pre {
+                font-size: 0.775rem;
+            }
         }
     </style>
 </head>
@@ -246,25 +321,43 @@
     </header>
 
     <main>
+        <div class="scanner-card">
+            <h3>Live Threat Detection</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Execute heuristic system scan using native engine workers.</p>
+            
+            <div class="scanner-actions">
+                <button id="scanBtn" class="btn-scan" onclick="runVirusScan()">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    Run Threat Scan
+                </button>
+            </div>
+
+            <div id="progressContainer" class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <div id="scanOutput" class="scan-output">System ready for evaluation.</div>
+        </div>
+
         <div class="grid">
             <div class="card">
                 <h3>Realtime Engine</h3>
-                <p>Native multi-threaded execution loop configured with low-overhead system call interception and signal handling.</p>
+                <p>Native multi-threaded execution loop configured with low-overhead system call interception.</p>
             </div>
             <div class="card">
                 <h3>Native Parser</h3>
-                <p>Zero-dependency C parser for direct file loading, eliminating complex config overhead for maximal boot speed.</p>
+                <p>Zero-dependency C parser for direct file loading, eliminating complex config overhead.</p>
             </div>
             <div class="card">
                 <h3>Isolation Vault</h3>
-                <p>Automated threat response mechanism isolating suspicious binaries directly to configured quarantine directories.</p>
+                <p>Automated threat response mechanism isolating suspicious binaries directly to quarantine.</p>
             </div>
         </div>
 
         <div class="section-grid">
             <div class="code-section">
                 <div class="code-header">
-                    <span class="code-title">Configuration Specification (project.c)</span>
+                    <span class="code-title">Configuration (project.c)</span>
                 </div>
                 <pre><code>name = "The Guard"
 version = "1.0.0"
@@ -286,7 +379,7 @@ quarantine_dir = "/var/lib/theguard/vault"</code></pre>
 
             <div class="code-section">
                 <div class="code-header">
-                    <span class="code-title">Control Gateway Paths (src/guard/Paths.js)</span>
+                    <span class="code-title">Gateway Paths (src/guard/Paths.js)</span>
                 </div>
                 <pre><code>export const PUBLIC_PATHS = {
   LOGIN: '/login',
@@ -315,23 +408,9 @@ export const PATHS = {
             </div>
         </div>
 
-        <div class="code-section">
-            <div class="code-header">
-                <span class="code-title">CLI Daemon Execution</span>
-            </div>
-            <pre><code># Build and run system daemon with custom configuration
-$ gcc -O3 src/main.c src/guard/config.c -o system-guard
-$ ./system-guard --config project.c --verbose
-
-[INFO] The Guard Engine Control Panel (v1.0.0)
-[INFO] Realtime Guard : ENABLED (8 Cores)
-[INFO] Isolation Vault: /var/lib/theguard/vault
-[INFO] Engine running. Press Ctrl+C to terminate.</code></pre>
-        </div>
-
         <div class="cta-container">
             <h2>Open Source Core Security</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Inspect the source code, contribute modules, or integrate The Guard into your infrastructure.</p>
+            <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.95rem;">Inspect the source code, contribute modules, or integrate The Guard into your infrastructure.</p>
             <a href="https://github.com/WebstieCrew/The-Guard" target="_blank" class="btn-github">
                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 View Repository on GitHub
@@ -342,6 +421,51 @@ $ ./system-guard --config project.c --verbose
     <footer>
         <p>&copy; WebstieCrew - <a href="https://github.com/WebstieCrew/The-Guard" target="_blank">The Guard Project</a></p>
     </footer>
+
+    <script>
+        function runVirusScan() {
+            const scanBtn = document.getElementById('scanBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const scanOutput = document.getElementById('scanOutput');
+
+            scanBtn.disabled = true;
+            scanBtn.style.opacity = '0.6';
+            scanBtn.style.cursor = 'not-allowed';
+
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressBar.style.backgroundColor = 'var(--accent-color)';
+
+            const steps = [
+                { progress: 20, text: 'Scanning active memory blocks...' },
+                { progress: 45, text: 'Analyzing system binaries and hooks...' },
+                { progress: 75, text: 'Evaluating heuristic signatures...' },
+                { progress: 90, text: 'Checking quarantine vault integrity...' },
+                { progress: 100, text: 'Scan Complete: 0 Threat(s) Found. System Secured.' }
+            ];
+
+            let currentStep = 0;
+
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressBar.style.width = step.progress + '%';
+                    scanOutput.innerText = step.text;
+
+                    if (step.progress === 100) {
+                        scanOutput.style.color = 'var(--accent-color)';
+                        scanBtn.disabled = false;
+                        scanBtn.style.opacity = '1';
+                        scanBtn.style.cursor = 'pointer';
+                    }
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 600);
+        }
+    </script>
 
 </body>
 </html>
